@@ -1,0 +1,65 @@
+server:
+  port: 8081
+  forward-headers-strategy: framework
+
+spring:
+  application:
+    name: tc-fiapx-auth-service
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/fiapx_auth}
+    username: ${DB_USER:fiapx_auth_user}
+    password: ${DB_PASSWORD:fiapx_auth_pass}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: ${DB_POOL_SIZE:10}
+      connection-timeout: 10000
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: false
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+  threads:
+    virtual:
+      enabled: true
+
+fiapx:
+  jwt:
+    secret: ${JWT_SECRET:fiapx-dev-secret-key-with-at-least-32-bytes}
+    expiration: ${JWT_EXPIRATION:PT2H}
+    issuer: ${JWT_ISSUER:fiapx-auth}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      show-details: never
+  tracing:
+    sampling:
+      probability: ${TRACING_SAMPLE:1.0}
+    export:
+      zipkin:
+        endpoint: ${ZIPKIN_ENDPOINT:http://localhost:9411/api/v2/spans}
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: alpha
+    tags-sorter: alpha
+
+logging:
+  level:
+    com.fiapx.auth: ${LOG_LEVEL:INFO}
+    org.springframework.security: WARN
