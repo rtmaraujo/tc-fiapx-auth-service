@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tc-fiapx-auth-service
+  namespace: fiapx
+  labels:
+    app: tc-fiapx-auth-service
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: tc-fiapx-auth-service
+  template:
+    metadata:
+      labels:
+        app: tc-fiapx-auth-service
+    spec:
+      containers:
+        - name: tc-fiapx-auth-service
+          image: ghcr.io/rtmaraujo/tc-fiapx-auth-service:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8081
+          envFrom:
+            - configMapRef:
+                name: auth-service-config
+            - secretRef:
+                name: auth-service-secret
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8081
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8081
+            initialDelaySeconds: 60
+            periodSeconds: 20
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "200m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            runAsUser: 1000
+            capabilities:
+              drop: ["ALL"]

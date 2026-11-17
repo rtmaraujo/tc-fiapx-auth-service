@@ -1,0 +1,41 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:fiapx_auth;MODE=PostgreSQL;DB_CLOSE_DELAY=-1;DATABASE_TO_LOWER=TRUE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    database-platform: org.hibernate.dialect.H2Dialect
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+  flyway:
+    enabled: false
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.zipkin.autoconfigure.ZipkinAutoConfiguration
+
+fiapx:
+  jwt:
+    secret: fiapx-test-secret-key-with-at-least-32-bytes
+    expiration: PT2H
+    issuer: fiapx-auth
+
+management:
+  tracing:
+    enabled: false
+    export:
+      enabled: false
+
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false
+
+logging:
+  level:
+    root: WARN
+    com.fiapx: INFO
